@@ -15,6 +15,6 @@ import lombok.*;
 public class RoleModel {
     @Id
     @Column(nullable = false)
-    private String roleId;
-    private String roles;
+    private String id;
+    private String name;
 }
