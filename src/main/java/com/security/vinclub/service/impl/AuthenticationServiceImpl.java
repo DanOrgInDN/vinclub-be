@@ -42,13 +42,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public ResponseBody<Object> registerUser(SignUpUserRequest request) {
         User user = new User();
-        var existsEmail = userRepository.existsByEmail(request.getEmail());
+        var isUsernameExisted = userRepository.existsByUsername(request.getUsername());
 
-        if (existsEmail) {
+        if (isUsernameExisted) {
             var errorMapping = ErrorData.builder()
-                    .errorKey1(EMAIL_EXIST.getCode())
+                    .errorKey1(USER_NOT_FOUND.getCode())
                     .build();
-            throw new ServiceSecurityException(HttpStatus.OK, EMAIL_EXIST, errorMapping);
+            throw new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
         }
 
         var role = roleRepository.findByName("USER");
