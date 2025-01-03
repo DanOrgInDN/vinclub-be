@@ -74,8 +74,7 @@ public class User implements UserDetails {
     @Column(name = "role_id", length = 50)
     private String roleId;
 
-    @Size(max = 50)
-    @Column(name = "total_amount", length = 50)
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
     @Column(name = "last_deposit_date")

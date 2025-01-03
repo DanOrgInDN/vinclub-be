@@ -40,9 +40,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JWTService jwtService;
     private final RoleRepository roleRepository;
 
-    public ResponseBody<Object> registerUser(SignUpUserRequest signUpUserRequest) {
+    public ResponseBody<Object> registerUser(SignUpUserRequest request) {
         User user = new User();
-        var existsEmail = userRepository.existsByEmail(signUpUserRequest.getEmail());
+        var existsEmail = userRepository.existsByEmail(request.getEmail());
 
         if (existsEmail) {
             var errorMapping = ErrorData.builder()
@@ -53,10 +53,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         var role = roleRepository.findByName("USER");
         user.setId(UUID.randomUUID().toString().replaceAll("-", ""));
-        user.setEmail(signUpUserRequest.getEmail());
+        user.setPhone(request.getPhone());
+        user.setReferenceCode(request.getReferenceCode());
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setRoleId(role.getId());
-        user.setFullName(signUpUserRequest.getFullName());
-        user.setPassword(passwordEncoder.encode(signUpUserRequest.getPassword()));
+        user.setFullName(request.getFullName());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedDate(LocalDateTime.now());
         userRepository.save(user);
         var response = new ResponseBody<>();

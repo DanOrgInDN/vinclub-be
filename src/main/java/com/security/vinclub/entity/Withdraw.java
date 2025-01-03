@@ -41,8 +41,7 @@ public class Withdraw {
     @Size(max = 50)
     @Column(name = "bank_name", length = 50, nullable = false)
     private String bankName;
-    @Size(max = 50)
-    @Column(name = "amount", length = 50, nullable = false)
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
     @Size(max = 50)
     @Column(name = "created_date", nullable = false)
