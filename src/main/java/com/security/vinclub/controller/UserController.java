@@ -11,38 +11,38 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final Validator validator;
 
-    @GetMapping("/un_auth/user/user_list")
-    public ResponseEntity<Object> getAllUserDetail() {
-        return ResponseEntity.ok(userService.getAllUserDetail());
-    }
-
-    @GetMapping("/un_auth/user/{user_id}")
+    @GetMapping("/{user_id}")
     public ResponseEntity<Object> getUserDetail(@PathVariable("user_id") String userId) {
         return ResponseEntity.ok(userService.getUserIdDetail(userId));
     }
 
-    @PostMapping("/un_auth/user/user_update")
+    @PostMapping("/update")
     public ResponseEntity<Object> updateUserDetail(@RequestBody UpdateUserRequest request) {
         this.validateRequest(request);
         return ResponseEntity.ok(userService.updateUser(request));
     }
 
-    @DeleteMapping("/admin/user/delete/{user_id}")
+    @DeleteMapping("/admin/delete/{user_id}")
     public ResponseEntity<Object> deleteUser(@PathVariable("user_id") String userId) {
         return ResponseEntity.ok(userService.deleteUserById(userId));
     }
 
-    @PostMapping("/admin/category/get_all_user")
+    @PatchMapping("/admin/activate/{user_id}")
+    public ResponseEntity<Object> activateUser(@PathVariable("user_id") String userId) {
+        return ResponseEntity.ok(userService.activateUserById(userId));
+    }
+
+    @PostMapping("/admin/all")
     public ResponseEntity<Object> getAllUser(@RequestBody UserSearchRequest request) {
         this.validateRequest(request);
-        return ResponseEntity.ok(userService.getAllUserPage(request));
+        return ResponseEntity.ok(userService.getAllUsers(request));
     }
 
     private <T> void validateRequest(T request) {

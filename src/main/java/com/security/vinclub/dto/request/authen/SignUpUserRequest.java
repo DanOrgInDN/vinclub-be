@@ -7,17 +7,21 @@ import lombok.Data;
 @Data
 public class SignUpUserRequest {
 
-    @NotBlank(message = "Name is not blank")
-    @JsonProperty("full_name")
-    private String fullName;
+    @NotBlank(message = "Tên tài khoản không được trống!")
+    private String username;
 
-    @NotBlank(message = "Password is not blank")
+    @NotBlank(message = "Mật khẩu không được trống!")
     private String password;
 
-    @NotBlank(message = "Email is not blank")
     private String email;
 
-    @NotBlank(message = "Role is not blank")
-    @JsonProperty("role_id")
-    private String roleId;
+    @NotBlank(message = "Họ & tên khoản không được trống!")
+    private String fullName;
+
+    @NotBlank(message = "Mã tham chiếu không được trống!")
+    private String referenceCode;
+
+    @NotBlank(message = "Số điện thoại không được trống!")
+    private String phone;
+
 }

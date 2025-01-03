@@ -9,13 +9,11 @@ public interface UserService {
 
     UserDetailsService userDetailsService();
 
-    ResponseBody<Object> getAllUserDetail();
-
     ResponseBody<Object> getUserIdDetail(String userId);
 
     ResponseBody<Object> updateUser(UpdateUserRequest request);
 
     ResponseBody<Object> deleteUserById(String userId);
-
-    ResponseBody<Object> getAllUserPage(UserSearchRequest request);
+    ResponseBody<Object> activateUserById(String userId);
+    ResponseBody<Object> getAllUsers(UserSearchRequest request);
 }

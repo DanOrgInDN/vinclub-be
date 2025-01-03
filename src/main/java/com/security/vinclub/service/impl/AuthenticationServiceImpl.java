@@ -9,6 +9,7 @@ import com.security.vinclub.dto.request.authen.SignUpUserRequest;
 import com.security.vinclub.dto.response.authen.JwtAuthenticationResponse;
 import com.security.vinclub.entity.User;
 import com.security.vinclub.exception.ServiceSecurityException;
+import com.security.vinclub.repository.RoleRepository;
 import com.security.vinclub.repository.UserRepository;
 import com.security.vinclub.service.AuthenticationService;
 import com.security.vinclub.service.JWTService;
@@ -37,6 +38,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private final JWTService jwtService;
+    private final RoleRepository roleRepository;
 
     public ResponseBody<Object> registerUser(SignUpUserRequest signUpUserRequest) {
         User user = new User();
@@ -49,9 +51,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ServiceSecurityException(HttpStatus.OK, EMAIL_EXIST, errorMapping);
         }
 
+        var role = roleRepository.findByName("USER");
         user.setId(UUID.randomUUID().toString().replaceAll("-", ""));
         user.setEmail(signUpUserRequest.getEmail());
-        user.setRoleId(signUpUserRequest.getRoleId());
+        user.setRoleId(role.getId());
         user.setFullName(signUpUserRequest.getFullName());
         user.setPassword(passwordEncoder.encode(signUpUserRequest.getPassword()));
         user.setCreatedDate(LocalDateTime.now());
@@ -64,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ResponseBody<Object> signIn(SignInRequest signInRequest) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(signInRequest.getUsername(), signInRequest.getPassword())
             );
         } catch (AuthenticationException e) {
             var errorMapping = ErrorData.builder()
@@ -72,7 +75,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
             throw new ServiceSecurityException(HttpStatus.UNAUTHORIZED, INVALID_CREDENTIALS, errorMapping);
         }
-        var user = userRepository.findByEmail(signInRequest.getEmail()).orElseThrow(() -> {
+        var user = userRepository.findByUsername(signInRequest.getUsername()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
                     .errorKey2(INVALID_REQUEST_PARAMETER.getCode())
                     .build();
@@ -97,7 +100,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ResponseBody<Object> changePassword(ChangePasswordRequest request) {
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getOldPassword())
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getOldPassword())
             );
         } catch (AuthenticationException e) {
             var errorMapping = ErrorData.builder()
@@ -105,7 +108,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
             throw new ServiceSecurityException(HttpStatus.UNAUTHORIZED, INVALID_CREDENTIALS, errorMapping);
         }
-        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> {
+        var user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
                     .errorKey2(USER_NOT_FOUND.getCode())
                     .build();

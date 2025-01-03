@@ -5,12 +5,12 @@ import lombok.Data;
 
 @Data
 public class ChangePasswordRequest {
-    @NotBlank(message = "Username is not blank")
-    private String email;
+    @NotBlank(message = "Tên tài khoản không được trống!")
+    private String username;
 
-    @NotBlank(message = "Old Password is not blank")
+    @NotBlank(message = "Mật khẩu cũ không được trống!")
     private String oldPassword;
 
-    @NotBlank(message = "New Password is not blank")
+    @NotBlank(message = "Mật khẩu mới không được trống!")
     private String newPassword;
 }

@@ -6,8 +6,10 @@ import com.security.vinclub.core.response.ResponseBody;
 import com.security.vinclub.dto.request.users.UpdateUserRequest;
 import com.security.vinclub.dto.request.users.UserSearchRequest;
 import com.security.vinclub.dto.response.users.UserDetailResponse;
+import com.security.vinclub.entity.Role;
 import com.security.vinclub.entity.User;
 import com.security.vinclub.exception.ServiceSecurityException;
+import com.security.vinclub.repository.RoleRepository;
 import com.security.vinclub.repository.UserRepository;
 import com.security.vinclub.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +23,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.security.vinclub.core.response.ResponseStatus.*;
 
@@ -32,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private static final String DEFAULT_SORT_FIELD = "createDate";
+    private final RoleRepository roleRepository;
 
     @Override
     public UserDetailsService userDetailsService() {
@@ -40,28 +45,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseBody<Object> getAllUserDetail() {
-        var userModelList = userRepository.findAll();
-        var userDetailList = userModelList.stream().map(userModel -> UserDetailResponse.builder()
-                .userId(userModel.getId())
-                .fullName(userModel.getFullName())
-                .email(userModel.getEmail())
-                .phoneNumber(userModel.getPhone())
-                .roleId(userModel.getRoleId())
-                .createDate(userModel.getCreatedDate())
-                .build()).toList();
-
-        var json = new ObjectMapper().createObjectNode();
-        json.putPOJO("userDetailList", userDetailList);
-
-        var response = new ResponseBody<>();
-        response.setOperationSuccess(SUCCESS, json);
-        return response;
-    }
-
-    @Override
     public ResponseBody<Object> getUserIdDetail(String userId) {
-        var userModel = userRepository.findById(userId).orElseThrow(() -> {
+        var user = userRepository.findById(userId).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        });
+
+        Role role = roleRepository.findById(user.getId()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
                     .errorKey1(USER_NOT_FOUND.getCode())
                     .build();
@@ -69,12 +61,22 @@ public class UserServiceImpl implements UserService {
         });
 
         UserDetailResponse userDetailResponse = UserDetailResponse.builder()
-                .userId(userModel.getId())
-                .fullName(userModel.getFullName())
-                .email(userModel.getEmail())
-                .phoneNumber(userModel.getPhone())
-                .roleId(userModel.getRoleId())
-                .createDate(userModel.getCreatedDate())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .roleId(user.getRoleId())
+                .roleName(role.getName())
+                .imageUrl(user.getImageUrl())
+                .referenceCode(user.getReferenceCode())
+                .totalAmount(user.getTotalAmount())
+                .lastDepositAmount(user.getLastDepositAmount())
+                .lastDepositDate(user.getLastDepositDate())
+                .lastWithDrawAmount(user.getLastWithDrawAmount())
+                .lastWithdrawDate(user.getLastWithdrawDate())
+                .createDate(user.getCreatedDate())
+                .activated(user.isActivated())
                 .build();
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, userDetailResponse);
@@ -119,7 +121,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseBody<Object> getAllUserPage(UserSearchRequest request) {
+    public ResponseBody<Object> activateUserById(String userId) {
+        var userModel = userRepository.findById(userId).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        });
+        userModel.setActivated(true);
+        userRepository.save(userModel);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, null);
+        return response;
+    }
+
+    private void validateEmailAndPhoneNumber(String email, String phoneNumber, String emailPresent, String phonePresent) {
+        var existsEmail = userRepository.existsByEmail(email);
+        if (!Objects.equals(email, emailPresent) && existsEmail) {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(EMAIL_EXIST.getCode())
+                    .build();
+            throw new ServiceSecurityException(HttpStatus.OK, EMAIL_EXIST, errorMapping);
+        }
+        if (!StringUtils.isBlank(phoneNumber) && !Objects.equals(phoneNumber, phonePresent)) {
+            var existsPhoneNumber = userRepository.existsByPhone(phoneNumber);
+            if (existsPhoneNumber) {
+                var errorMapping = ErrorData.builder()
+                        .errorKey1(PHONE_NUMBER_EXIST.getCode())
+                        .build();
+                throw new ServiceSecurityException(HttpStatus.OK, PHONE_NUMBER_EXIST, errorMapping);
+            }
+        }
+    }
+
+    @Override
+    public ResponseBody<Object> getAllUsers(UserSearchRequest request) {
         var mapper = new ObjectMapper();
         var json = mapper.createObjectNode();
 
@@ -139,47 +176,43 @@ public class UserServiceImpl implements UserService {
             pageable = PageRequest.of(Integer.parseInt(request.getPageNumber()) - 1, Integer.parseInt(request.getPageSize()), Sort.by(request.getSortBy()).ascending());
         }
 
-        Page<User> listUserPage = userRepository.findByEmailAndUsername(request.getEmail(), request.getUserName(), pageable);
+        Page<User> listUserPage = userRepository.findAllUsers(pageable);
 
-        var listUser = listUserPage.getContent();
+        var users = listUserPage.getContent();
+        List<String> roleIds = users.stream().map(User::getRoleId).toList();
 
-        var listUserModel = listUser.stream().map(userModel ->
+        List<Role> roles = roleRepository.findByIdIn(roleIds);
+        Map<String, String> roleMap = roles.stream()
+                .collect(Collectors.toMap(Role::getId, Role::getName));
+
+        var userResponse = users.stream().map(user ->
                 UserDetailResponse.builder()
-                        .userId(userModel.getId())
-                        .fullName(userModel.getFullName())
-                        .email(userModel.getEmail())
-                        .phoneNumber(userModel.getPhone())
-                        .roleId(userModel.getRoleId())
-                        .createDate(userModel.getCreatedDate())
+                        .userId(user.getId())
+                        .username(user.getUsername())
+                        .fullName(user.getFullName())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .roleId(user.getRoleId())
+                        .roleName(roleMap.get(user.getRoleId()))
+                        .imageUrl(user.getImageUrl())
+                        .referenceCode(user.getReferenceCode())
+                        .totalAmount(user.getTotalAmount())
+                        .lastDepositAmount(user.getLastDepositAmount())
+                        .lastDepositDate(user.getLastDepositDate())
+                        .lastWithDrawAmount(user.getLastWithDrawAmount())
+                        .lastWithdrawDate(user.getLastWithdrawDate())
+                        .createDate(user.getCreatedDate())
+                        .activated(user.isActivated())
                         .build());
 
         json.putPOJO("page_number", request.getPageNumber());
         json.putPOJO("total_records", listUserPage.getTotalElements());
         json.putPOJO("page_size", request.getPageSize());
-        json.putPOJO("list_user", listUserModel);
+        json.putPOJO("list_user", userResponse);
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, json);
 
         return response;
-    }
-
-    private void validateEmailAndPhoneNumber(String email, String phoneNumber, String emailPresent, String phonePresent) {
-        var existsEmail = userRepository.existsByEmail(email);
-        if (!Objects.equals(email, emailPresent) && existsEmail) {
-            var errorMapping = ErrorData.builder()
-                    .errorKey1(EMAIL_EXIST.getCode())
-                    .build();
-            throw new ServiceSecurityException(HttpStatus.OK, EMAIL_EXIST, errorMapping);
-        }
-        if (!StringUtils.isBlank(phoneNumber) && !Objects.equals(phoneNumber, phonePresent)) {
-            var existsPhoneNumber = userRepository.existsByPhoneNumber(phoneNumber);
-            if (existsPhoneNumber) {
-                var errorMapping = ErrorData.builder()
-                        .errorKey1(PHONE_NUMBER_EXIST.getCode())
-                        .build();
-                throw new ServiceSecurityException(HttpStatus.OK, PHONE_NUMBER_EXIST, errorMapping);
-            }
-        }
     }
 }

@@ -12,22 +12,22 @@ import lombok.*;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UpdateUserRequest {
-    @NotBlank(message = "User id is not blank")
+    @NotBlank(message = "ID người dùng không được để trống")
     @JsonProperty("user_id")
     private String userId;
 
-    @NotBlank(message = "Name is not blank")
+    @NotBlank(message = "Tên không được để trống")
     @JsonProperty("full_name")
     private String fullName;
 
-    @NotBlank(message = "Email is not blank")
-    @Email(message = "Email must be valid")
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email phải hợp lệ")
     private String email;
 
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @NotBlank(message = "Role is not blank")
+    @NotBlank(message = "Vai trò không được để trống")
     @JsonProperty("role_id")
     private String roleId;
 }

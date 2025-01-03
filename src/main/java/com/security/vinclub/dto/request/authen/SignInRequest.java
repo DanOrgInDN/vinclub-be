@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class SignInRequest {
 
-    @NotBlank(message = "Username is not blank")
-    private String email;
+    @NotBlank(message = "Tên tài khoản không được trống!")
+    private String username;
 
-    @NotBlank(message = "Password is not blank")
+    @NotBlank(message = "Mật khẩu không được trống!")
     private String password;
 }

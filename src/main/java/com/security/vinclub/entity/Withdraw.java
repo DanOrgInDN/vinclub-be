@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 @Entity(name = WithdrawRepository.TABLE)
 public class Withdraw {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     @Size(max = 50)
     @Column(name = "user_id", length = 50, nullable = false)

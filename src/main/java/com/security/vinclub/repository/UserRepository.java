@@ -16,11 +16,19 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByPhone(String phone);
+
+    Optional<User> findByUsername(String username);
+    boolean existsById(String id);
+
     boolean existsByEmail(String email);
 
-    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByPhone(String phoneNumber);
 
     @Query(value = "SELECT * FROM " + TABLE +
             " WHERE email LIKE %:email% AND CONCAT(firstName,lastName) LIKE %:username% ", nativeQuery = true)
     Page<User> findByEmailAndUsername(@Param("email") String email, @Param("username") String username, Pageable pageable);
+
+    @Query("SELECT u FROM " + TABLE + " u WHERE u.deleted = FALSE ")
+    Page<User> findAllUsers(Pageable pageable);
 }

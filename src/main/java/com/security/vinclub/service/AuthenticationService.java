@@ -15,4 +15,5 @@ public interface AuthenticationService {
     ResponseBody<Object> changePassword(ChangePasswordRequest changePasswordRequest);
 
     ResponseBody<Object> refreshToken(RefreshTokenRequest refreshTokenRequest);
+
 }

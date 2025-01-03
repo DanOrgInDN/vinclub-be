@@ -1,10 +1,13 @@
 package com.security.vinclub.dto.response.users;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,14 +17,19 @@ import java.time.LocalDateTime;
 public class UserDetailResponse {
 
     private String userId;
+    private String username;
     private String fullName;
     private String email;
-    private String phoneNumber;
-    private String address;
-    private String city;
-    private String state;
-    private String zipCode;
+    private String phone;
     private String roleId;
+    private String roleName;
+    private String imageUrl;
+    private String referenceCode;
+    private BigDecimal totalAmount;
+    private LocalDateTime lastDepositDate;
+    private LocalDateTime lastWithdrawDate;
+    private BigDecimal lastDepositAmount;
+    private BigDecimal lastWithDrawAmount;
     private LocalDateTime createDate;
-    private LocalDateTime modifyDate;
+    private boolean activated;
 }
