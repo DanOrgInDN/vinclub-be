@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = RoleRepository.TABLE)
-public class RoleModel {
+public class Role {
     @Id
     @Column(nullable = false)
     private String id;

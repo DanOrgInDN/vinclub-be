@@ -1,7 +1,7 @@
 package com.security.vinclub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.security.vinclub.repository.UsersRepository;
+import com.security.vinclub.repository.UserRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +16,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -28,12 +26,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = UsersRepository.TABLE)
-public class UsersModel implements UserDetails {
+@Entity(name = UserRepository.TABLE)
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @JsonIgnore
     @NotNull
@@ -65,6 +63,10 @@ public class UsersModel implements UserDetails {
     @Column(nullable = false)
     private boolean activated = false;
 
+    @NotNull
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     @Size(max = 256)
     @Column(name = "image_url", length = 256)
     private String imageUrl;
@@ -74,8 +76,8 @@ public class UsersModel implements UserDetails {
     private String roleId;
 
     @Size(max = 50)
-    @Column(name = "money", length = 50)
-    private BigDecimal money;
+    @Column(name = "total_amount", length = 50)
+    private BigDecimal totalAmount;
 
     @Column(name = "last_deposit_date")
     private LocalDateTime lastDepositDate;
@@ -88,6 +90,9 @@ public class UsersModel implements UserDetails {
 
     @Column(name = "last_withDraw_amount")
     private BigDecimal lastWithDrawAmount;
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
 
 
     @Override

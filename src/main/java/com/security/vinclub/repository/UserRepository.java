@@ -1,6 +1,6 @@
 package com.security.vinclub.repository;
 
-import com.security.vinclub.entity.UsersModel;
+import com.security.vinclub.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UsersRepository extends JpaRepository<UsersModel, String> {
-    String TABLE = "users";
+public interface UserRepository extends JpaRepository<User, String> {
+    String TABLE = "user";
 
-    Optional<UsersModel> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
 
@@ -22,5 +22,5 @@ public interface UsersRepository extends JpaRepository<UsersModel, String> {
 
     @Query(value = "SELECT * FROM " + TABLE +
             " WHERE email LIKE %:email% AND CONCAT(firstName,lastName) LIKE %:username% ", nativeQuery = true)
-    Page<UsersModel> findByEmailAndUsername(@Param("email") String email, @Param("username") String username, Pageable pageable);
+    Page<User> findByEmailAndUsername(@Param("email") String email, @Param("username") String username, Pageable pageable);
 }

@@ -7,9 +7,9 @@ import com.security.vinclub.dto.request.authen.RefreshTokenRequest;
 import com.security.vinclub.dto.request.authen.SignInRequest;
 import com.security.vinclub.dto.request.authen.SignUpUserRequest;
 import com.security.vinclub.dto.response.authen.JwtAuthenticationResponse;
-import com.security.vinclub.entity.UsersModel;
+import com.security.vinclub.entity.User;
 import com.security.vinclub.exception.ServiceSecurityException;
-import com.security.vinclub.repository.UsersRepository;
+import com.security.vinclub.repository.UserRepository;
 import com.security.vinclub.service.AuthenticationService;
 import com.security.vinclub.service.JWTService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import static com.security.vinclub.core.response.ResponseStatus.*;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -39,8 +39,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JWTService jwtService;
 
     public ResponseBody<Object> registerUser(SignUpUserRequest signUpUserRequest) {
-        UsersModel usersModel = new UsersModel();
-        var existsEmail = usersRepository.existsByEmail(signUpUserRequest.getEmail());
+        User user = new User();
+        var existsEmail = userRepository.existsByEmail(signUpUserRequest.getEmail());
 
         if (existsEmail) {
             var errorMapping = ErrorData.builder()
@@ -49,16 +49,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ServiceSecurityException(HttpStatus.OK, EMAIL_EXIST, errorMapping);
         }
 
-        usersModel.setUserId(UUID.randomUUID().toString().replaceAll("-", ""));
-        usersModel.setEmail(signUpUserRequest.getEmail());
-        usersModel.setFirstName(signUpUserRequest.getFirstName());
-        usersModel.setLastName(signUpUserRequest.getLastName());
-        usersModel.setRoleId(signUpUserRequest.getRoleId());
-        usersModel.setPassword(passwordEncoder.encode(signUpUserRequest.getPassword()));
-        usersModel.setCreateDate(LocalDateTime.now());
-        usersRepository.save(usersModel);
+        user.setId(UUID.randomUUID().toString().replaceAll("-", ""));
+        user.setEmail(signUpUserRequest.getEmail());
+        user.setRoleId(signUpUserRequest.getRoleId());
+        user.setFullName(signUpUserRequest.getFullName());
+        user.setPassword(passwordEncoder.encode(signUpUserRequest.getPassword()));
+        user.setCreatedDate(LocalDateTime.now());
+        userRepository.save(user);
         var response = new ResponseBody<>();
-        response.setOperationSuccess(SUCCESS, usersModel);
+        response.setOperationSuccess(SUCCESS, user);
         return response;
     }
 
@@ -73,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
             throw new ServiceSecurityException(HttpStatus.UNAUTHORIZED, INVALID_CREDENTIALS, errorMapping);
         }
-        var user = usersRepository.findByEmail(signInRequest.getEmail()).orElseThrow(() -> {
+        var user = userRepository.findByEmail(signInRequest.getEmail()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
                     .errorKey2(INVALID_REQUEST_PARAMETER.getCode())
                     .build();
@@ -85,7 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
         jwtAuthenticationResponse.setToken(jwt);
         jwtAuthenticationResponse.setRefreshToken(refreshToken);
-        jwtAuthenticationResponse.setUserId(user.getUserId());
+        jwtAuthenticationResponse.setUserId(user.getId());
         jwtAuthenticationResponse.setRoleId(user.getRoleId());
         jwtAuthenticationResponse.setUsername(user.getUsername());
 
@@ -106,7 +105,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
             throw new ServiceSecurityException(HttpStatus.UNAUTHORIZED, INVALID_CREDENTIALS, errorMapping);
         }
-        var user = usersRepository.findByEmail(request.getEmail()).orElseThrow(() -> {
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
                     .errorKey2(USER_NOT_FOUND.getCode())
                     .build();
@@ -114,8 +113,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         });
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        user.setCreateDate(LocalDateTime.now());
-        usersRepository.save(user);
+        user.setCreatedDate(LocalDateTime.now());
+        userRepository.save(user);
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, user);
         return response;
@@ -123,20 +122,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public ResponseBody<Object> refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String userEmail = jwtService.extractUsername(refreshTokenRequest.getToken());
-        UsersModel usersModel = usersRepository.findByEmail(userEmail).orElseThrow();
+        User user = userRepository.findByEmail(userEmail).orElseThrow();
 
-        if (jwtService.isTokenValid(refreshTokenRequest.getToken(), usersModel)) {
+        if (jwtService.isTokenValid(refreshTokenRequest.getToken(), user)) {
             var errorMapping = ErrorData.builder()
                     .errorKey1(INVALID_REQUEST_PARAMETER.getCode())
                     .build();
             throw new ServiceSecurityException(HttpStatus.OK, INVALID_REQUEST_PARAMETER, errorMapping);
         }
-        var jwt = jwtService.generateToken(usersModel);
+        var jwt = jwtService.generateToken(user);
 
         JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
         jwtAuthenticationResponse.setToken(jwt);
         jwtAuthenticationResponse.setRefreshToken(refreshTokenRequest.getToken());
-        jwtAuthenticationResponse.setUserId(usersModel.getUserId());
+        jwtAuthenticationResponse.setUserId(user.getId());
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, jwtAuthenticationResponse);

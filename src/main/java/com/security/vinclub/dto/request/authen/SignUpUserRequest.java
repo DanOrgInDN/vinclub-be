@@ -7,13 +7,9 @@ import lombok.Data;
 @Data
 public class SignUpUserRequest {
 
-    @NotBlank(message = "First name is not blank")
-    @JsonProperty("first_name")
-    private String firstName;
-
-    @NotBlank(message = "Last name is not blank")
-    @JsonProperty("last_name")
-    private String lastName;
+    @NotBlank(message = "Name is not blank")
+    @JsonProperty("full_name")
+    private String fullName;
 
     @NotBlank(message = "Password is not blank")
     private String password;
