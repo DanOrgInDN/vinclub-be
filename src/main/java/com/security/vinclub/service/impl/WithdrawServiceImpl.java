@@ -28,7 +28,7 @@ public class WithdrawServiceImpl implements WithdrawService {
     public ResponseBody<Object> createWithdrawTransaction(CreateWithdrawRequest request) {
         var isUserExisted = userRepository.existsById(request.getUserId());
 
-        if (isUserExisted) {
+        if (!isUserExisted) {
             var errorMapping = ErrorData.builder()
                     .errorKey1(USER_NOT_FOUND.getCode())
                     .build();

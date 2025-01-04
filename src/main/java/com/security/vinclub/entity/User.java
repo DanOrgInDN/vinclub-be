@@ -38,11 +38,9 @@ public class User implements UserDetails {
     @Column(name = "password", length = 60, nullable = false)
     private String password;
 
-    @Size(max = 50)
     @Column(name = "username", length = 50, nullable = false, unique = true)
     private String username;
 
-    @Size(max = 50)
     @Column(name = "full_name", length = 50, nullable = false)
     private String fullName;
 

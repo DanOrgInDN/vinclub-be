@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
             return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
         });
 
-        Role role = roleRepository.findById(user.getId()).orElseThrow(() -> {
+        Role role = roleRepository.findById(user.getRoleId()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
-                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .errorKey1(ROLE_NOT_FOUND.getCode())
                     .build();
-            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+            return new ServiceSecurityException(HttpStatus.OK, ROLE_NOT_FOUND, errorMapping);
         });
 
         UserDetailResponse userDetailResponse = UserDetailResponse.builder()

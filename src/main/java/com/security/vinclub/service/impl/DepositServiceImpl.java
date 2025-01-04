@@ -30,7 +30,7 @@ public class DepositServiceImpl implements DepositService {
     public ResponseBody<Object> createDepositTransaction(CreateDepositRequest request) {
         var isUserExisted = userRepository.existsById(request.getUserId());
 
-        if (isUserExisted) {
+        if (!isUserExisted) {
             var errorMapping = ErrorData.builder()
                     .errorKey1(USER_NOT_FOUND.getCode())
                     .build();

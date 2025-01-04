@@ -26,24 +26,18 @@ import java.time.LocalDateTime;
 public class Deposit {
     @Id
     private String id;
-    @Size(max = 50)
     @Column(name = "user_id", length = 50, nullable = false)
     private String userId;
-    @Size(max = 50)
     @Column(name = "status", length = 50, nullable = false)
     private AppovalStatusEnum status = AppovalStatusEnum.PENDING;
-    @Size(max = 50)
     @Column(name = "account_number", length = 50, nullable = false)
     private String accountNumber;
-    @Size(max = 50)
     @Column(name = "account_name", length = 50, nullable = false)
     private String accountName;
-    @Size(max = 50)
     @Column(name = "bank_name", length = 50, nullable = false)
     private String bankName;
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
-    @Size(max = 50)
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 }
