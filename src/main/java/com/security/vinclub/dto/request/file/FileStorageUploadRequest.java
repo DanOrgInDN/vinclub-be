@@ -24,8 +24,8 @@ public class FileStorageUploadRequest {
     private String description;
     @JsonProperty("file_directory")
     private String fileDirectory;
-    @JsonProperty("getDoc_type_id")
-    private String getDocTypeId;
+    @JsonProperty("doc_type_id")
+    private String docTypeId;
 
     @NotBlank(message = "ID người dùng không được để trống")
     @JsonProperty("user_id")
