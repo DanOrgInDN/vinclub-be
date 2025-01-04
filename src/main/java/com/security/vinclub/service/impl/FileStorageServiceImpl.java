@@ -12,9 +12,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.security.vinclub.core.response.ResponseStatus.SUCCESS;
-import static com.security.vinclub.core.response.ResponseStatus.USER_NOT_FOUND;
+import static com.security.vinclub.core.response.ResponseStatus.*;
 
 @Slf4j
 @Service
@@ -79,6 +81,26 @@ public class FileStorageServiceImpl implements FileStorageService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file: " + e.getMessage());
         }
+    }
+
+    @Override
+    public byte[] downloadOriginalWithUrl(String fileId) throws IOException {
+        FileStorage fileStorageModel = fileStorageRepository.findById(fileId).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(FILE_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, FILE_NOT_FOUND, errorMapping);
+        });
+        String fileDirectory = fileStorageModel.getFileDirectory();
+
+        File file = new File(fileDirectory);
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        HttpHeaders headers = getHttpHeaders(fileStorageModel.getRawFileName());
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(bytes).getBody();
     }
 
     private String getFileExtension(String fileName) {

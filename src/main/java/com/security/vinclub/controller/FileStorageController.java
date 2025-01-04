@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,6 +24,12 @@ public class FileStorageController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, @PathVariable("user_id") String userId) {
         return ResponseEntity.ok(fileStorageService.uploadAvatar(file, userId));
+    }
+
+    @GetMapping(value = "/un_auth/files/download/original/{fileId}", produces = {MediaType.IMAGE_JPEG_VALUE})
+    @ResponseBody
+    public ResponseEntity<byte[]> downloadFileOriginalWithUrl(@PathVariable String fileId) throws IOException {
+        return ResponseEntity.ok(fileStorageService.downloadOriginalWithUrl(fileId));
     }
 
     private <T> void validateRequest(T request) {
