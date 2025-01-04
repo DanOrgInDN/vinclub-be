@@ -11,19 +11,19 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final Validator validator;
 
-    @GetMapping("/{user_id}")
+    @GetMapping("/user/{user_id}")
     public ResponseEntity<Object> getUserDetail(@PathVariable("user_id") String userId) {
         return ResponseEntity.ok(userService.getUserIdDetail(userId));
     }
 
-    @PostMapping("/update")
+    @PostMapping("/user/update")
     public ResponseEntity<Object> updateUserDetail(@RequestBody UpdateUserRequest request) {
         this.validateRequest(request);
         return ResponseEntity.ok(userService.updateUser(request));
@@ -39,7 +39,7 @@ public class UserController {
         return ResponseEntity.ok(userService.activateUserById(userId));
     }
 
-    @PostMapping("/admin/all")
+    @PostMapping("/admin/user/all")
     public ResponseEntity<Object> getAllUser(@RequestBody UserSearchRequest request) {
         this.validateRequest(request);
         return ResponseEntity.ok(userService.getAllUsers(request));

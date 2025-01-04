@@ -43,7 +43,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/un_auth/**")
                         .permitAll()
                         .requestMatchers("/api/v1/admin").hasAnyAuthority("1")
-                        .requestMatchers("/api/v1/user").hasAnyAuthority("2")
+                        .requestMatchers("/api/v1/user", "/api/v1/deposit", "/api/v1/withdraw").hasAnyAuthority("1","2")
                         .anyRequest().authenticated())
 
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
