@@ -6,10 +6,7 @@ import com.security.vinclub.service.DepositService;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/deposit")
@@ -22,6 +19,16 @@ public class DepositController {
     public ResponseEntity<Object> createDepositTransaction(@RequestBody CreateDepositRequest request) {
         this.validateRequest(request);
         return ResponseEntity.ok(depositService.createDepositTransaction(request));
+    }
+
+    @PatchMapping("/approve/{id}")
+    public ResponseEntity<Object> approveDeposit(@PathVariable("id") String id) {
+        return ResponseEntity.ok(depositService.approveDeposit(id));
+    }
+
+    @PatchMapping("/reject/{id}")
+    public ResponseEntity<Object> rejectDeposit(@PathVariable("id") String id) {
+        return ResponseEntity.ok(depositService.rejectDeposit(id));
     }
 
     private <T> void validateRequest(T request) {

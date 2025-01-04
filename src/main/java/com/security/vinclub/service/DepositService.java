@@ -7,4 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface DepositService {
 
     ResponseBody<Object> createDepositTransaction(CreateDepositRequest request);
+
+    ResponseBody<Object> approveDeposit(String id);
+
+    ResponseBody<Object> rejectDeposit(String id);
 }

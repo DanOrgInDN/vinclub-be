@@ -49,4 +49,14 @@ public class DepositServiceImpl implements DepositService {
         response.setOperationSuccess(SUCCESS, deposit);
         return response;
     }
+
+    @Override
+    public ResponseBody<Object> approveDeposit(String id) {
+        return null;
+    }
+
+    @Override
+    public ResponseBody<Object> rejectDeposit(String id) {
+        return null;
+    }
 }
