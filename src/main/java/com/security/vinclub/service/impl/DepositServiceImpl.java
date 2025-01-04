@@ -5,16 +5,20 @@ import com.security.vinclub.core.response.ResponseBody;
 import com.security.vinclub.dto.request.deposit.CreateDepositRequest;
 import com.security.vinclub.entity.Deposit;
 import com.security.vinclub.entity.User;
+import com.security.vinclub.enumeration.AppovalStatusEnum;
 import com.security.vinclub.exception.ServiceSecurityException;
 import com.security.vinclub.repository.DepositRepository;
 import com.security.vinclub.repository.UserRepository;
 import com.security.vinclub.service.DepositService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -51,12 +55,61 @@ public class DepositServiceImpl implements DepositService {
     }
 
     @Override
+    @Transactional
     public ResponseBody<Object> approveDeposit(String id) {
-        return null;
+        Deposit deposit = depositRepository.findById(id).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(DEPOSIT_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, DEPOSIT_NOT_FOUND, errorMapping);
+        });
+
+        deposit.setStatus(AppovalStatusEnum.APPROVED);
+
+        var user = userRepository.findById(deposit.getUserId()).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        });
+
+        BigDecimal newTotalAmount = user.getTotalAmount().add(deposit.getAmount());
+        user.setTotalAmount(newTotalAmount);
+        user.setLastDepositAmount(deposit.getAmount());
+        user.setLastDepositDate(LocalDateTime.now());
+
+        depositRepository.save(deposit);
+        userRepository.save(user);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, id);
+        return response;
     }
 
     @Override
+    @Transactional
     public ResponseBody<Object> rejectDeposit(String id) {
-        return null;
+        Deposit deposit = depositRepository.findById(id).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(DEPOSIT_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, DEPOSIT_NOT_FOUND, errorMapping);
+        });
+
+        deposit.setStatus(AppovalStatusEnum.REJECTED);
+        depositRepository.save(deposit);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, id);
+        return response;
+    }
+
+    @Override
+    public ResponseBody<Object> getPendingDeposits(Pageable pageable) {
+        var pendingDeposits = depositRepository.findByStatus(AppovalStatusEnum.PENDING, pageable);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, pendingDeposits);
+        return response;
     }
 }
