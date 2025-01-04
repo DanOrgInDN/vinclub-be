@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.security.vinclub.repository.UserRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -65,8 +63,8 @@ public class User implements UserDetails {
     private boolean deleted = false;
 
     @Size(max = 256)
-    @Column(name = "image_url", length = 256)
-    private String imageUrl;
+    @Column(name = "image_id", length = 256)
+    private String imageId;
 
     @Size(max = 50)
     @Column(name = "role_id", length = 50)

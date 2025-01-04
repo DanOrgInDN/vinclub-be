@@ -70,7 +70,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             fileStorage.setCreateDate(LocalDateTime.now());
             fileStorageRepository.save(fileStorage);
 
-            user.setImageUrl(path.toString());
+            user.setImageId(fileId);
             userRepository.save(user);
 
             var response = new ResponseBody<>();

@@ -26,7 +26,7 @@ public class FileStorageController {
         return ResponseEntity.ok(fileStorageService.uploadAvatar(file, userId));
     }
 
-    @GetMapping(value = "/un_auth/files/download/original/{fileId}", produces = {MediaType.IMAGE_JPEG_VALUE})
+    @GetMapping(value = "/un_auth/files/download/{fileId}", produces = {MediaType.IMAGE_JPEG_VALUE})
     @ResponseBody
     public ResponseEntity<byte[]> downloadFileOriginalWithUrl(@PathVariable String fileId) throws IOException {
         return ResponseEntity.ok(fileStorageService.downloadOriginalWithUrl(fileId));
