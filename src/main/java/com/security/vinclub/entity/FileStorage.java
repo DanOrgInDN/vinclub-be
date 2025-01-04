@@ -17,13 +17,21 @@ import java.time.LocalDateTime;
 public class FileStorage {
     @Id
     @Column(nullable = false)
-    private String fileId;
+    private String id;
+    @Column(name = "file_directory")
     private String fileDirectory;
+    @Column(name = "raw_file_name")
     private String rawFileName;
+    @Column(name = "file_name")
     private String fileName;
+    @Column(name = "file_extension")
     private String fileExtension;
+    @Column(name = "description")
     private String description;
+    @Column(name = "file_type")
     private String fileType;
+    @Column(name = "create_date")
     private LocalDateTime createDate;
+    @Column(name = "modify_date")
     private LocalDateTime modifyDate;
 }

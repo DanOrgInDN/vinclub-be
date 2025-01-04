@@ -52,8 +52,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     public ResponseBody<Object> uploadFile(FileStorageUploadRequest request) {
         var response = new ResponseBody<>();
         var file = request.getFile();
-        var rawFileName = request.getFile_name();
-        var subDirectory = this.getSubDirectory(request.getFile_directory());
+        var rawFileName = request.getFileName();
+        var subDirectory = this.getSubDirectory(request.getFileDirectory());
         var fileId = UUID.randomUUID().toString().replaceAll("-", "");
         var currentDateTime = LocalDateTime.now();
         try {
@@ -62,7 +62,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             }
             String directoryPath = BASE_PATH + subDirectory;
             String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
-            String docTypeId = request.getDoc_type_id();
+            String docTypeId = request.getGetDocTypeId();
             var fileName = fileId + "." + fileExtension;
             if (Objects.nonNull(docTypeId)) {
                 fileName = docTypeId + "-" + fileName;
@@ -88,8 +88,8 @@ public class FileStorageServiceImpl implements FileStorageService {
                 Files.write(Paths.get(directoryPath + fileName), bytes);
             }
 
-            FileStorage fileStorageModel = FileStorage.builder()
-                    .fileId(fileId)
+            FileStorage fileStorage = FileStorage.builder()
+                    .id(fileId)
                     .fileDirectory(subDirectory)
                     .rawFileName(rawFileName)
                     .fileName(fileName)
@@ -97,7 +97,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                     .description(request.getDescription())
                     .createDate(currentDateTime)
                     .build();
-            fileStorageRepository.save(fileStorageModel);
+            fileStorageRepository.save(fileStorage);
             var json = new ObjectMapper().createObjectNode();
             json.putPOJO("file_id", fileId);
             response.setOperationSuccess(SUCCESS, json);

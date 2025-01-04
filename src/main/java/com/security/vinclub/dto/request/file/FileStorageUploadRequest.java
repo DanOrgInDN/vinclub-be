@@ -1,7 +1,7 @@
 package com.security.vinclub.dto.request.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.security.vinclub.utils.EnumValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,10 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageUploadRequest {
     @NotNull(message = "File is not null")
     private MultipartFile file;
-
-    private String file_name;
+    @JsonProperty("file_name")
+    private String fileName;
+    @JsonProperty("description")
     private String description;
-    private String file_directory;
-    private String doc_type_id;
+    @JsonProperty("file_directory")
+    private String fileDirectory;
+    @JsonProperty("getDoc_type_id")
+    private String getDocTypeId;
+
+    @NotBlank(message = "ID người dùng không được để trống")
+    @JsonProperty("user_id")
+    private String userId;
 
 }
