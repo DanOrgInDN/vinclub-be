@@ -4,7 +4,6 @@ import com.security.vinclub.core.response.ErrorData;
 import com.security.vinclub.core.response.ResponseBody;
 import com.security.vinclub.dto.request.deposit.CreateDepositRequest;
 import com.security.vinclub.entity.Deposit;
-import com.security.vinclub.entity.User;
 import com.security.vinclub.enumeration.AppovalStatusEnum;
 import com.security.vinclub.exception.ServiceSecurityException;
 import com.security.vinclub.repository.DepositRepository;
@@ -13,8 +12,6 @@ import com.security.vinclub.service.DepositService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,8 +69,11 @@ public class DepositServiceImpl implements DepositService {
                     .build();
             return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
         });
-
-        BigDecimal newTotalAmount = user.getTotalAmount().add(deposit.getAmount());
+        BigDecimal currentAmount = user.getTotalAmount();
+        if(currentAmount == null) {
+            currentAmount = BigDecimal.ZERO;
+        }
+        BigDecimal newTotalAmount = currentAmount.add(deposit.getAmount());
         user.setTotalAmount(newTotalAmount);
         user.setLastDepositAmount(deposit.getAmount());
         user.setLastDepositDate(LocalDateTime.now());

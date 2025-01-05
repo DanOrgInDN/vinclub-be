@@ -35,7 +35,7 @@ import static com.security.vinclub.core.response.ResponseStatus.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private static final String DEFAULT_SORT_FIELD = "createDate";
+    private static final String DEFAULT_SORT_FIELD = "createdDate";
     private final RoleRepository roleRepository;
 
     @Override

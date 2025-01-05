@@ -22,8 +22,8 @@ public class WithdrawController {
     private final Validator validator;
 
     enum SortBy {
-        UPDATEDATE("updateDate"), // Ngày cập nhật
-        CREATEDATE("createDate"), // Ngày tạo
+        UPDATEDATE("updatedDate"),
+        CREATEDATE("createdDate"),
         ;
 
         private String field;
