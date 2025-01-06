@@ -9,10 +9,7 @@ import com.security.vinclub.service.AuthenticationService;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/un_auth")
@@ -47,7 +44,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/token/check-expire/{token}")
-    public ResponseEntity<Object> checkExpiredToken(@RequestBody String token) {
+    public ResponseEntity<Object> checkExpiredToken(@PathVariable("token") String token) {
         return ResponseEntity.ok(authenticationService.checkExpiredToken(token));
     }
 
