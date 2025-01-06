@@ -7,6 +7,7 @@ import com.security.vinclub.dto.request.authen.RefreshTokenRequest;
 import com.security.vinclub.dto.request.authen.SignInRequest;
 import com.security.vinclub.dto.request.authen.SignUpUserRequest;
 import com.security.vinclub.dto.response.authen.JwtAuthenticationResponse;
+import com.security.vinclub.entity.Role;
 import com.security.vinclub.entity.User;
 import com.security.vinclub.exception.ServiceSecurityException;
 import com.security.vinclub.repository.RoleRepository;
@@ -84,6 +85,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .build();
             return new ServiceSecurityException(HttpStatus.OK, INVALID_REQUEST_PARAMETER, errorMapping);
         });
+
+        Role role = roleRepository.findById(user.getRoleId()).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(ROLE_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, ROLE_NOT_FOUND, errorMapping);
+        });
+
         var jwt = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
 
@@ -93,6 +102,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         jwtAuthenticationResponse.setUserId(user.getId());
         jwtAuthenticationResponse.setRoleId(user.getRoleId());
         jwtAuthenticationResponse.setUsername(user.getUsername());
+        jwtAuthenticationResponse.setRoleName(role.getName());
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, jwtAuthenticationResponse);
