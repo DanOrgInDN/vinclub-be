@@ -16,4 +16,5 @@ public interface AuthenticationService {
 
     ResponseBody<Object> refreshToken(RefreshTokenRequest refreshTokenRequest);
 
+    ResponseBody<Object> checkExpiredToken(String token);
 }

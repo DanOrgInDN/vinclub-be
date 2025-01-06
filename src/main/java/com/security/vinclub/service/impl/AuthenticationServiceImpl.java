@@ -147,4 +147,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         response.setOperationSuccess(SUCCESS, jwtAuthenticationResponse);
         return response;
     }
+
+    @Override
+    public ResponseBody<Object> checkExpiredToken(String token) {
+        String username = jwtService.extractUsername(token);
+        var user = userRepository.findByUsername(username).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey2(USER_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        });
+        if (!jwtService.isTokenValid(token, user)) {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(TOKEN_EXPIRED.getCode())
+                    .build();
+            throw new ServiceSecurityException(HttpStatus.OK, TOKEN_EXPIRED, errorMapping);
+        }
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, true);
+        return response;
+    }
 }

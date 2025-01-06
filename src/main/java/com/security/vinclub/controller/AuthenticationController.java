@@ -46,6 +46,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.changePassword(request));
     }
 
+    @PostMapping("/token/check-expire/{token}")
+    public ResponseEntity<Object> checkExpiredToken(@RequestBody String token) {
+        return ResponseEntity.ok(authenticationService.checkExpiredToken(token));
+    }
+
     private <T> void validateRequest(T request) {
         var violations = validator.validate(request);
         if (!violations.isEmpty()) throw new ServiceSecurityException(violations);
