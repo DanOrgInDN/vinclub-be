@@ -109,4 +109,13 @@ public class WithdrawServiceImpl implements WithdrawService {
         response.setOperationSuccess(SUCCESS, pendingWithdraws);
         return response;
     }
+
+    @Override
+    public ResponseBody<Object> searchPendingWithdraws(String searchText, Pageable pageable) {
+        var pendingDeposits = withdrawRepository.searchPendingWithdraws(searchText, pageable);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, pendingDeposits);
+        return response;
+    }
 }

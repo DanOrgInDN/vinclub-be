@@ -59,6 +59,17 @@ public class DepositController {
         return ResponseEntity.ok(depositService.getPendingDeposits(pageable));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Object> searchPendingDeposits(@RequestParam(defaultValue = DEFAULT_SORT_BY) SortBy sortBy,
+                                                     @RequestParam(defaultValue = DEFAULT_DIRECTION) Sort.Direction direction,
+                                                     @RequestParam(value = "size", defaultValue = DEFAULT_PAGE_SIZE) int size,
+                                                     @RequestParam(value = "page", defaultValue = DEFAULT_PAGE_NUMBER) int page,
+                                                     @RequestParam(value = "search_text") String searchText) {
+        Sort sort = JpaSort.unsafe(direction, sortBy.field);
+        Pageable pageable = BussinessCommon.castToPageable(page, sort, size);
+        return ResponseEntity.ok(depositService.searchPendingDeposits(searchText, pageable));
+    }
+
     private <T> void validateRequest(T request) {
         var violations = validator.validate(request);
         if (!violations.isEmpty()) throw new ServiceSecurityException(violations);

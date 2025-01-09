@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserSearchRequest {
 
+    @JsonProperty("search_text")
+    private String searchText;
+
     @JsonProperty("email")
     private String email;
 

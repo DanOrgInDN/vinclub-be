@@ -1,6 +1,7 @@
 package com.security.vinclub.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.vinclub.common.SecurityContext;
 import com.security.vinclub.core.response.ErrorData;
 import com.security.vinclub.core.response.ResponseBody;
 import com.security.vinclub.dto.request.users.UpdateUserRequest;
@@ -128,7 +129,11 @@ public class UserServiceImpl implements UserService {
                     .build();
             return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
         });
-        userModel.setActivated(true);
+        if(userModel.isActivated()) {
+            userModel.setActivated(false);
+        } else {
+            userModel.setActivated(true);
+        }
         userRepository.save(userModel);
 
         var response = new ResponseBody<>();
@@ -160,6 +165,8 @@ public class UserServiceImpl implements UserService {
         var mapper = new ObjectMapper();
         var json = mapper.createObjectNode();
 
+        String currentUserId = SecurityContext.getCurrentUserId();
+
         Pageable pageable;
 
         if (request.getSortBy() == null || request.getSortBy().isEmpty()) {
@@ -176,7 +183,71 @@ public class UserServiceImpl implements UserService {
             pageable = PageRequest.of(Integer.parseInt(request.getPageNumber()) - 1, Integer.parseInt(request.getPageSize()), Sort.by(request.getSortBy()).ascending());
         }
 
-        Page<User> listUserPage = userRepository.findAllUsers(pageable);
+        Page<User> listUserPage = userRepository.findAllUsers(currentUserId, pageable);
+
+        var users = listUserPage.getContent();
+        List<String> roleIds = users.stream().map(User::getRoleId).toList();
+
+        List<Role> roles = roleRepository.findByIdIn(roleIds);
+        Map<String, String> roleMap = roles.stream()
+                .collect(Collectors.toMap(Role::getId, Role::getName));
+
+        var userResponse = users.stream().map(user ->
+                UserDetailResponse.builder()
+                        .userId(user.getId())
+                        .username(user.getUsername())
+                        .fullName(user.getFullName())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .roleId(user.getRoleId())
+                        .roleName(roleMap.get(user.getRoleId()))
+                        .imageUrl(user.getImageId())
+                        .referenceCode(user.getReferenceCode())
+                        .totalAmount(user.getTotalAmount())
+                        .lastDepositAmount(user.getLastDepositAmount())
+                        .lastDepositDate(user.getLastDepositDate())
+                        .lastWithDrawAmount(user.getLastWithDrawAmount())
+                        .lastWithdrawDate(user.getLastWithdrawDate())
+                        .createDate(user.getCreatedDate())
+                        .activated(user.isActivated())
+                        .build());
+
+        json.putPOJO("page_number", request.getPageNumber());
+        json.putPOJO("total_records", listUserPage.getTotalElements());
+        json.putPOJO("page_size", request.getPageSize());
+        json.putPOJO("list_user", userResponse);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, json);
+
+        return response;
+    }
+
+    @Override
+    public ResponseBody<Object> searchAllUsers(UserSearchRequest request) {
+        var mapper = new ObjectMapper();
+        var json = mapper.createObjectNode();
+
+        String currentUserId = SecurityContext.getCurrentUserId();
+
+        Pageable pageable;
+
+        if (request.getSortBy() == null || request.getSortBy().isEmpty()) {
+            request.setSortBy(DEFAULT_SORT_FIELD);
+        }
+
+        if (request.getSortDirection() == null || request.getSortDirection().isEmpty()) {
+            request.setSortDirection("asc");
+        }
+
+        if (request.getSortDirection().equalsIgnoreCase("desc")) {
+            pageable = PageRequest.of(Integer.parseInt(request.getPageNumber()) - 1, Integer.parseInt(request.getPageSize()), Sort.by(request.getSortBy()).descending());
+        } else {
+            pageable = PageRequest.of(Integer.parseInt(request.getPageNumber()) - 1, Integer.parseInt(request.getPageSize()), Sort.by(request.getSortBy()).ascending());
+        }
+
+        String searchText = request.getSearchText() != null ? request.getSearchText() : "";
+        Page<User> listUserPage = userRepository.searchAllUsers(currentUserId, searchText, pageable);
 
         var users = listUserPage.getContent();
         List<String> roleIds = users.stream().map(User::getRoleId).toList();

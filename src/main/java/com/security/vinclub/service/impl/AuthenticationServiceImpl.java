@@ -86,6 +86,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new ServiceSecurityException(HttpStatus.OK, INVALID_REQUEST_PARAMETER, errorMapping);
         });
 
+        if (!user.isActivated()) {
+            var errorMapping = ErrorData.builder()
+                    .errorKey2(ACCOUNT_DEACTIVATED.getCode())
+                    .build();
+            throw  new ServiceSecurityException(HttpStatus.OK, ACCOUNT_DEACTIVATED, errorMapping);
+        }
+
         Role role = roleRepository.findById(user.getRoleId()).orElseThrow(() -> {
             var errorMapping = ErrorData.builder()
                     .errorKey1(ROLE_NOT_FOUND.getCode())

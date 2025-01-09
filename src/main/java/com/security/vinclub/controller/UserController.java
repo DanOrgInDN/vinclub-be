@@ -45,6 +45,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers(request));
     }
 
+    @PostMapping("/admin/user/search")
+    public ResponseEntity<Object> searchAllUser(@RequestBody UserSearchRequest request) {
+        this.validateRequest(request);
+        return ResponseEntity.ok(userService.searchAllUsers(request));
+    }
+
     private <T> void validateRequest(T request) {
         var violations = validator.validate(request);
         if (!violations.isEmpty()) throw new ServiceSecurityException(violations);

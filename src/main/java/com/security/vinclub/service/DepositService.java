@@ -14,4 +14,6 @@ public interface DepositService {
     ResponseBody<Object> rejectDeposit(String id);
 
     ResponseBody<Object> getPendingDeposits(Pageable pageable);
+
+    ResponseBody<Object> searchPendingDeposits(String searchText, Pageable pageable);
 }

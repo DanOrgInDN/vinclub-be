@@ -16,4 +16,5 @@ public interface UserService {
     ResponseBody<Object> deleteUserById(String userId);
     ResponseBody<Object> activateUserById(String userId);
     ResponseBody<Object> getAllUsers(UserSearchRequest request);
+    ResponseBody<Object> searchAllUsers(UserSearchRequest request);
 }

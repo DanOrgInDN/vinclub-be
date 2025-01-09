@@ -1,6 +1,7 @@
 package com.security.vinclub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.security.vinclub.common.SecurityContext;
 import com.security.vinclub.repository.UserRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,12 +51,12 @@ public class User implements UserDetails {
     private String referenceCode;
 
     @Email
-    @Column(length = 254, unique = true)
+    @Column(length = 254)
     private String email;
 
     @NotNull
     @Column(nullable = false)
-    private boolean activated = false;
+    private boolean activated = true;
 
     @NotNull
     @Column(nullable = false)
@@ -87,6 +88,9 @@ public class User implements UserDetails {
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
+    protected User getCurrentUser() {
+        return SecurityContext.getCurrentUser();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

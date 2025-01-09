@@ -30,6 +30,14 @@ public interface UserRepository extends JpaRepository<User, String> {
             " WHERE email LIKE %:email% AND CONCAT(firstName,lastName) LIKE %:username% ", nativeQuery = true)
     Page<User> findByEmailAndUsername(@Param("email") String email, @Param("username") String username, Pageable pageable);
 
-    @Query("SELECT u FROM " + TABLE + " u WHERE u.deleted = FALSE ")
-    Page<User> findAllUsers(Pageable pageable);
+    @Query("SELECT u FROM " + TABLE + " u WHERE u.deleted = FALSE and u.id != :currentUserId ")
+    Page<User> findAllUsers(String currentUserId, Pageable pageable);
+
+    @Query("SELECT u FROM " + TABLE + " u WHERE u.deleted = FALSE AND u.id != :currentUserId " +
+            "AND (u.phone IS NULL OR u.phone LIKE %:searchText%)" +
+            "AND (u.username IS NULL OR u.username LIKE %:searchText%)" +
+            "AND (u.fullName IS NULL OR u.fullName LIKE %:searchText%)" +
+            "AND (u.email IS NULL OR u.email LIKE %:searchText%)"
+    )
+    Page<User> searchAllUsers(String currentUserId, String searchText, Pageable pageable);
 }

@@ -3,6 +3,7 @@ package com.security.vinclub.service.impl;
 import com.security.vinclub.core.response.ErrorData;
 import com.security.vinclub.core.response.ResponseBody;
 import com.security.vinclub.dto.request.deposit.CreateDepositRequest;
+import com.security.vinclub.dto.response.deposit.PendingDepositResponse;
 import com.security.vinclub.entity.Deposit;
 import com.security.vinclub.enumeration.AppovalStatusEnum;
 import com.security.vinclub.exception.ServiceSecurityException;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.security.vinclub.core.response.ResponseStatus.*;
@@ -112,4 +114,14 @@ public class DepositServiceImpl implements DepositService {
         response.setOperationSuccess(SUCCESS, pendingDeposits);
         return response;
     }
+
+    @Override
+    public ResponseBody<Object> searchPendingDeposits(String searchText, Pageable pageable) {
+        var pendingDeposits = depositRepository.searchPendingDeposits(searchText, pageable);
+
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, pendingDeposits);
+        return response;
+    }
+
 }
