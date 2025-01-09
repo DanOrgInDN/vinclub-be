@@ -13,6 +13,8 @@ import java.util.List;
 public interface DepositRepository extends JpaRepository<Deposit, String> {
     String TABLE = "deposit";
 
+    @Query("SELECT NEW com.security.vinclub.dto.response.deposit.PendingDepositResponse(d.id, u.id, u.username, u.phone, d.status, d.accountNumber, d.accountName, d.bankName, d.amount, d.createdDate) " +
+            "FROM " + TABLE + " d JOIN user u ON u.id = d.userId WHERE d.status = 0 ")
     Page<Deposit> findByStatus(AppovalStatusEnum appovalStatusEnum, Pageable pageable);
 
     @Query("SELECT NEW com.security.vinclub.dto.response.deposit.PendingDepositResponse(d.id, u.id, u.username, u.phone, d.status, d.accountNumber, d.accountName, d.bankName, d.amount, d.createdDate) " +
