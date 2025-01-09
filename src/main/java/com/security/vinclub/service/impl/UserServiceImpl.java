@@ -216,6 +216,7 @@ public class UserServiceImpl implements UserService {
         json.putPOJO("total_records", listUserPage.getTotalElements());
         json.putPOJO("page_size", request.getPageSize());
         json.putPOJO("list_user", userResponse);
+        json.putPOJO("total_page", listUserPage.getTotalPages());
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, json);
@@ -280,6 +281,7 @@ public class UserServiceImpl implements UserService {
         json.putPOJO("total_records", listUserPage.getTotalElements());
         json.putPOJO("page_size", request.getPageSize());
         json.putPOJO("list_user", userResponse);
+        json.putPOJO("total_page", listUserPage.getTotalPages());
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, json);
