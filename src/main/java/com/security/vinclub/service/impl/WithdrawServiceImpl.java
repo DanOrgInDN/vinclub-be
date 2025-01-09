@@ -112,7 +112,7 @@ public class WithdrawServiceImpl implements WithdrawService {
 
     @Override
     public ResponseBody<Object> searchPendingWithdraws(String searchText, Pageable pageable) {
-        var pendingDeposits = withdrawRepository.searchPendingWithdraws(searchText, pageable);
+        var pendingDeposits = withdrawRepository.searchPendingWithdraws(searchText.toLowerCase(), pageable);
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, pendingDeposits);

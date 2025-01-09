@@ -248,7 +248,7 @@ public class UserServiceImpl implements UserService {
         }
 
         String searchText = request.getSearchText() != null ? request.getSearchText() : "";
-        Page<User> listUserPage = userRepository.searchAllUsers(currentUserId, searchText, pageable);
+        Page<User> listUserPage = userRepository.searchAllUsers(currentUserId, searchText.toLowerCase(), pageable);
 
         var users = listUserPage.getContent();
         List<String> roleIds = users.stream().map(User::getRoleId).toList();

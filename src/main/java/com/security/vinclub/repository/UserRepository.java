@@ -33,11 +33,12 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM " + TABLE + " u WHERE u.deleted = FALSE and u.id != :currentUserId ")
     Page<User> findAllUsers(String currentUserId, Pageable pageable);
 
-    @Query("SELECT u FROM " + TABLE + " u WHERE u.deleted = FALSE AND u.id != :currentUserId " +
-            "OR (u.phone IS NULL OR u.phone LIKE %:searchText%)" +
-            "OR (u.username IS NULL OR u.username LIKE %:searchText%)" +
-            "OR (u.fullName IS NULL OR u.fullName LIKE %:searchText%)" +
-            "OR (u.email IS NULL OR u.email LIKE %:searchText%)"
+    @Query("SELECT u FROM " + TABLE + " u WHERE " +
+            "(u.phone IS NULL OR LOWER(u.phone) LIKE %:searchText%)" +
+            "OR (u.username IS NULL OR LOWER(u.username) LIKE %:searchText%)" +
+            "OR (u.fullName IS NULL OR LOWER(u.fullName) LIKE %:searchText%)" +
+            "OR (u.email IS NULL OR LOWER(u.email) LIKE %:searchText%)" +
+            "AND u.deleted = FALSE AND u.id != :currentUserId "
     )
     Page<User> searchAllUsers(String currentUserId, String searchText, Pageable pageable);
 }

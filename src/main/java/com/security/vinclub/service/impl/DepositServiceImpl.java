@@ -117,7 +117,7 @@ public class DepositServiceImpl implements DepositService {
 
     @Override
     public ResponseBody<Object> searchPendingDeposits(String searchText, Pageable pageable) {
-        var pendingDeposits = depositRepository.searchPendingDeposits(searchText, pageable);
+        var pendingDeposits = depositRepository.searchPendingDeposits(searchText.toLowerCase(), pageable);
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, pendingDeposits);
