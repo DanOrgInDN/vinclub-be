@@ -7,9 +7,11 @@ import com.security.vinclub.dto.request.authen.RefreshTokenRequest;
 import com.security.vinclub.dto.request.authen.SignInRequest;
 import com.security.vinclub.dto.request.authen.SignUpUserRequest;
 import com.security.vinclub.dto.response.authen.JwtAuthenticationResponse;
+import com.security.vinclub.entity.ReferenceCode;
 import com.security.vinclub.entity.Role;
 import com.security.vinclub.entity.User;
 import com.security.vinclub.exception.ServiceSecurityException;
+import com.security.vinclub.repository.ReferenceCodeRepository;
 import com.security.vinclub.repository.RoleRepository;
 import com.security.vinclub.repository.UserRepository;
 import com.security.vinclub.service.AuthenticationService;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static com.security.vinclub.core.response.ResponseStatus.*;
@@ -40,6 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JWTService jwtService;
     private final RoleRepository roleRepository;
+    private final ReferenceCodeRepository referenceCodeRepository;
 
     public ResponseBody<Object> registerUser(SignUpUserRequest request) {
         User user = new User();
@@ -50,6 +54,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .errorKey1(USER_NOT_FOUND.getCode())
                     .build();
             throw new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        }
+
+        List<ReferenceCode> referenceCodes = referenceCodeRepository.findByDeletedFalse();
+        List<String> refCodes = referenceCodes.stream().map(ReferenceCode::getReferenceCode).toList();
+        if(!refCodes.contains(request.getReferenceCode())) {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(REFERENCE_CODE_NOT_FOUND.getCode())
+                    .build();
+            throw new ServiceSecurityException(HttpStatus.OK, REFERENCE_CODE_NOT_FOUND, errorMapping);
         }
 
         var role = roleRepository.findByName("USER");

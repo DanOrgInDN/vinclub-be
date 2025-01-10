@@ -20,7 +20,8 @@ public enum ResponseStatus {
     DEPOSIT_NOT_FOUND("010", "Deposit not found"),
     WITHDRAW_NOT_FOUND("011", "Withdraw not found"),
     TOKEN_EXPIRED("012", "Token is expired"),
-    ACCOUNT_DEACTIVATED("012", "Account is deactivated"),
+    ACCOUNT_DEACTIVATED("013", "Account is deactivated"),
+    REFERENCE_CODE_NOT_FOUND("014", "Reference code not found"),
     INVALID_CREDENTIALS("031", "Invalid Credentials"),
     INTERNAL_SERVER_ERROR("999", "Internal server error");
 
