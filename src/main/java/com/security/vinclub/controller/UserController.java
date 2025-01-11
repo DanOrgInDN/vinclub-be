@@ -51,6 +51,15 @@ public class UserController {
         return ResponseEntity.ok(userService.searchAllUsers(request));
     }
 
+    @PostMapping("/admin/fund/add")
+    public ResponseEntity<Object> addFund(@RequestParam String username, @RequestParam String amount) {
+        return ResponseEntity.ok(userService.addFundToUser(username, amount));
+    }
+    @PostMapping("/admin/fund/deduct")
+    public ResponseEntity<Object> deductFund(@RequestParam String username, @RequestParam String amount) {
+        return ResponseEntity.ok(userService.deductFundFromUser(username, amount));
+    }
+
     private <T> void validateRequest(T request) {
         var violations = validator.validate(request);
         if (!violations.isEmpty()) throw new ServiceSecurityException(violations);

@@ -17,4 +17,8 @@ public interface UserService {
     ResponseBody<Object> activateUserById(String userId);
     ResponseBody<Object> getAllUsers(UserSearchRequest request);
     ResponseBody<Object> searchAllUsers(UserSearchRequest request);
+
+    ResponseBody<Object> addFundToUser(String username, String amount);
+    ResponseBody<Object> deductFundFromUser(String username, String amount);
+
 }

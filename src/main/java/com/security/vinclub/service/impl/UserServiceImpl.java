@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -287,5 +288,51 @@ public class UserServiceImpl implements UserService {
         response.setOperationSuccess(SUCCESS, json);
 
         return response;
+    }
+
+    @Override
+    public ResponseBody<Object> addFundToUser(String username, String amount) {
+        var userModel = userRepository.findByUsername(username).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        });
+        BigDecimal currentAmount = userModel.getTotalAmount();
+        userModel.setTotalAmount(currentAmount.add(safeConvert(amount)));
+        userRepository.save(userModel);
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, userModel);
+
+        return response;
+    }
+
+    @Override
+    public ResponseBody<Object> deductFundFromUser(String username, String amount) {
+        var userModel = userRepository.findByUsername(username).orElseThrow(() -> {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .build();
+            return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+        });
+        BigDecimal currentAmount = userModel.getTotalAmount();
+        if (currentAmount.compareTo(BigDecimal.ZERO) > 0) {
+            currentAmount = currentAmount.subtract(safeConvert(amount)).max(BigDecimal.ZERO);
+            userModel.setTotalAmount(currentAmount);
+            userRepository.save(userModel);
+        }
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, userModel);
+
+        return response;
+    }
+
+    public static BigDecimal safeConvert(String str) {
+        try {
+            return new BigDecimal(str);
+        } catch (NumberFormatException e) {
+            System.err.println("Chuỗi không hợp lệ: " + str);
+            return BigDecimal.ZERO;
+        }
     }
 }
