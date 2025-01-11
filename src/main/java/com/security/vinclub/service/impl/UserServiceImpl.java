@@ -298,7 +298,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
         });
-        BigDecimal currentAmount = userModel.getTotalAmount();
+        BigDecimal currentAmount = userModel.getTotalAmount() == null ? BigDecimal.ZERO : userModel.getTotalAmount();
         userModel.setTotalAmount(currentAmount.add(safeConvert(amount)));
         userRepository.save(userModel);
         var response = new ResponseBody<>();
@@ -315,7 +315,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             return new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
         });
-        BigDecimal currentAmount = userModel.getTotalAmount();
+        BigDecimal currentAmount = userModel.getTotalAmount() == null ? BigDecimal.ZERO : userModel.getTotalAmount();
         if (currentAmount.compareTo(BigDecimal.ZERO) > 0) {
             currentAmount = currentAmount.subtract(safeConvert(amount)).max(BigDecimal.ZERO);
             userModel.setTotalAmount(currentAmount);
