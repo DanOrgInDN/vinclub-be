@@ -3,6 +3,7 @@ package com.security.vinclub.service.impl;
 import com.security.vinclub.common.SecurityContext;
 import com.security.vinclub.core.response.ErrorData;
 import com.security.vinclub.core.response.ResponseBody;
+import com.security.vinclub.dto.response.referencecode.GetReferenceCodeResponse;
 import com.security.vinclub.entity.ReferenceCode;
 import com.security.vinclub.entity.User;
 import com.security.vinclub.exception.ServiceSecurityException;
@@ -53,7 +54,7 @@ public class ReferenceCodeServiceImpl implements ReferenceCodeService {
 
     @Override
     public ResponseBody<Object> getAllReferenceCodes(Pageable pageable) {
-        Page<ReferenceCode> refCodes = referenceCodeRepository.findAllRefCodes(pageable);
+        Page<GetReferenceCodeResponse> refCodes = referenceCodeRepository.findAllRefCodes(pageable);
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, refCodes);
@@ -62,7 +63,7 @@ public class ReferenceCodeServiceImpl implements ReferenceCodeService {
 
     @Override
     public ResponseBody<Object> searchAllReferenceCodes(String searchText, Pageable pageable) {
-        Page<ReferenceCode> refCodes = referenceCodeRepository.searchAllRefCodes(searchText, pageable);
+        Page<GetReferenceCodeResponse> refCodes = referenceCodeRepository.searchAllRefCodes(searchText.toLowerCase(), pageable);
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, refCodes);

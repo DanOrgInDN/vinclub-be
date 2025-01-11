@@ -1,5 +1,6 @@
 package com.security.vinclub.repository;
 
+import com.security.vinclub.dto.response.referencecode.GetReferenceCodeResponse;
 import com.security.vinclub.entity.ReferenceCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +16,14 @@ public interface ReferenceCodeRepository extends JpaRepository<ReferenceCode, St
 
     @Query("SELECT NEW com.security.vinclub.dto.response.referencecode.GetReferenceCodeResponse(rc.id, rc.createdBy, u.username, u.phone, rc.referenceCode, rc.createdDate) " +
             "FROM " + TABLE + " rc JOIN user u ON u.id = rc.createdBy WHERE rc.deleted = false")
-    Page<ReferenceCode> findAllRefCodes(Pageable pageable);
+    Page<GetReferenceCodeResponse> findAllRefCodes(Pageable pageable);
 
     @Query("SELECT NEW com.security.vinclub.dto.response.referencecode.GetReferenceCodeResponse(rc.id, rc.createdBy, u.username, u.phone, rc.referenceCode, rc.createdDate) " +
             "FROM " + TABLE + " rc JOIN user u ON u.id = rc.createdBy " +
             "WHERE (u.username IS NULL OR LOWER(u.username) LIKE %:searchText%) " +
             "OR (rc.referenceCode IS NULL OR LOWER(rc.referenceCode) LIKE %:searchText%) " +
             "AND rc.deleted = false")
-    Page<ReferenceCode> searchAllRefCodes(String searchText, Pageable pageable);
+    Page<GetReferenceCodeResponse> searchAllRefCodes(String searchText, Pageable pageable);
 
     List<ReferenceCode> findByDeletedFalse();
 }

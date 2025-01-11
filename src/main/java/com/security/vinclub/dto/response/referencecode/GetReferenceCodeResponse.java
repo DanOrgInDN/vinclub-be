@@ -15,8 +15,8 @@ public class GetReferenceCodeResponse {
     private String username;
     @JsonProperty("phone")
     private String phone;
-    @JsonProperty("phone")
-    private String reference_code;
+    @JsonProperty("reference_code")
+    private String referenceCode;
     @JsonProperty("created_date")
     private LocalDateTime createdDate;
 }
