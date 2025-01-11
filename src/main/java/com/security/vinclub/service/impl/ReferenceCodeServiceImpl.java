@@ -44,6 +44,7 @@ public class ReferenceCodeServiceImpl implements ReferenceCodeService {
         refCode.setReferenceCode(generateRandomCode(5));
         refCode.setCreatedDate(LocalDateTime.now());
         refCode.setCreatedBy(user.getId());
+        referenceCodeRepository.save(refCode);
 
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, refCode);
