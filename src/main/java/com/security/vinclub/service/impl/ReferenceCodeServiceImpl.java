@@ -42,7 +42,7 @@ public class ReferenceCodeServiceImpl implements ReferenceCodeService {
 
         ReferenceCode refCode = new ReferenceCode();
         refCode.setId(UUID.randomUUID().toString().replaceAll("-", ""));
-        refCode.setReferenceCode(generateRandomCode(5));
+        refCode.setReferenceCode(generateRandomCode(6));
         refCode.setCreatedDate(LocalDateTime.now());
         refCode.setCreatedBy(user.getId());
         referenceCodeRepository.save(refCode);
@@ -74,7 +74,7 @@ public class ReferenceCodeServiceImpl implements ReferenceCodeService {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
         StringBuilder sb = new StringBuilder(length);
-
+        sb.append("vic");
         for (int i = 0; i < length; i++) {
             int index = random.nextInt(characters.length()); // Lấy chỉ số ngẫu nhiên
             sb.append(characters.charAt(index)); // Thêm ký tự ngẫu nhiên vào chuỗi
