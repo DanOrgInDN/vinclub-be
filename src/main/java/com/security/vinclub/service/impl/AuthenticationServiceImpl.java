@@ -51,11 +51,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (isUsernameExisted) {
             var errorMapping = ErrorData.builder()
-                    .errorKey1(USER_NOT_FOUND.getCode())
+                    .errorKey1(USER_NAME_EXIST.getCode())
                     .build();
-            throw new ServiceSecurityException(HttpStatus.OK, USER_NOT_FOUND, errorMapping);
+            throw new ServiceSecurityException(HttpStatus.OK, USER_NAME_EXIST, errorMapping);
         }
 
+        var isPhoneExisted = userRepository.existsByPhone(request.getPhone());
+
+        if (isPhoneExisted) {
+            var errorMapping = ErrorData.builder()
+                    .errorKey1(PHONE_EXIST.getCode())
+                    .build();
+            throw new ServiceSecurityException(HttpStatus.OK, PHONE_EXIST, errorMapping);
+        }
         List<ReferenceCode> referenceCodes = referenceCodeRepository.findByDeletedFalse();
         List<String> refCodes = referenceCodes.stream().map(ReferenceCode::getReferenceCode).toList();
         if(!refCodes.contains(request.getReferenceCode())) {

@@ -21,7 +21,7 @@ public class ServiceSecurityException extends ServiceException {
     }
 
     public ServiceSecurityException(HttpStatus statusCode, ResponseStatus status, Object... args){
-        super(statusCode, null, null, status.getCode(), status.getMessage(), args);
+        super(statusCode, null, null, status.getCode(), status.getVieMsg(), args);
     }
 
     public ServiceSecurityException(Set<? extends ConstraintViolation<?>> violations) {
