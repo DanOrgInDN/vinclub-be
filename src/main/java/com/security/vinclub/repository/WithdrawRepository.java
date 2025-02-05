@@ -23,4 +23,6 @@ public interface WithdrawRepository extends JpaRepository<Withdraw, String> {
             "OR (u.phone IS NULL OR LOWER(u.phone) LIKE  %:searchText%) " +
             "OR (d.bankName IS NULL OR LOWER(d.bankName) LIKE  %:searchText%)")
     Page<PendingWithdrawResponse> searchPendingWithdraws(String searchText, Pageable pageable);
+
+    List<Withdraw> findByUserId(String userId);
 }

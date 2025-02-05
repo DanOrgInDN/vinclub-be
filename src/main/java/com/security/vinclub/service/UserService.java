@@ -21,4 +21,5 @@ public interface UserService {
     ResponseBody<Object> addFundToUser(String username, String amount);
     ResponseBody<Object> deductFundFromUser(String username, String amount);
 
+    ResponseBody<Object> getUserTransaction(String userId);
 }

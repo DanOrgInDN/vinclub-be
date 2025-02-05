@@ -6,12 +6,17 @@ import com.security.vinclub.core.response.ErrorData;
 import com.security.vinclub.core.response.ResponseBody;
 import com.security.vinclub.dto.request.users.UpdateUserRequest;
 import com.security.vinclub.dto.request.users.UserSearchRequest;
+import com.security.vinclub.dto.response.GetTransactionResponse;
 import com.security.vinclub.dto.response.users.UserDetailResponse;
+import com.security.vinclub.entity.Deposit;
 import com.security.vinclub.entity.Role;
 import com.security.vinclub.entity.User;
+import com.security.vinclub.entity.Withdraw;
 import com.security.vinclub.exception.ServiceSecurityException;
+import com.security.vinclub.repository.DepositRepository;
 import com.security.vinclub.repository.RoleRepository;
 import com.security.vinclub.repository.UserRepository;
+import com.security.vinclub.repository.WithdrawRepository;
 import com.security.vinclub.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +30,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,6 +43,8 @@ import static com.security.vinclub.core.response.ResponseStatus.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final WithdrawRepository withdrawRepository;
+    private final DepositRepository depositRepository;
     private static final String DEFAULT_SORT_FIELD = "createdDate";
     private final RoleRepository roleRepository;
 
@@ -323,6 +331,37 @@ public class UserServiceImpl implements UserService {
         }
         var response = new ResponseBody<>();
         response.setOperationSuccess(SUCCESS, userModel);
+
+        return response;
+    }
+
+    @Override
+    public ResponseBody<Object> getUserTransaction(String userId) {
+        List<GetTransactionResponse> rs = new ArrayList<>();
+        if(userId != null) {
+            List<Deposit> deposits = depositRepository.findByUserId(userId);
+            List<Withdraw> withdraws = withdrawRepository.findByUserId(userId);
+            for (Deposit deposit : deposits) {
+                GetTransactionResponse response = GetTransactionResponse.builder()
+                        .date(deposit.getCreatedDate().toString())
+                        .amount(deposit.getAmount().toString())
+                        .status(deposit.getStatus().getDescription())
+                        .type("deposit")
+                        .build();
+                rs.add(response);
+            }
+            for (Withdraw withdraw : withdraws) {
+                GetTransactionResponse response = GetTransactionResponse.builder()
+                        .date(withdraw.getCreatedDate().toString())
+                        .amount(withdraw.getAmount().toString())
+                        .status(withdraw.getStatus().getDescription())
+                        .type("withdrawal")
+                        .build();
+                rs.add(response);
+            }
+        }
+        var response = new ResponseBody<>();
+        response.setOperationSuccess(SUCCESS, rs);
 
         return response;
     }

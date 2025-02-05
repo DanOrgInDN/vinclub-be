@@ -23,6 +23,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserIdDetail(userId));
     }
 
+    @GetMapping("/user/transaction/{user_id}")
+    public ResponseEntity<Object> getUserTransaction(@PathVariable("user_id") String userId) {
+        return ResponseEntity.ok(userService.getUserTransaction(userId));
+    }
+
     @PostMapping("/user/update")
     public ResponseEntity<Object> updateUserDetail(@RequestBody UpdateUserRequest request) {
         this.validateRequest(request);

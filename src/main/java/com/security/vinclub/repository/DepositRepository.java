@@ -25,4 +25,6 @@ public interface DepositRepository extends JpaRepository<Deposit, String> {
             "OR (u.phone IS NULL OR LOWER(u.phone) LIKE  %:searchText%) " +
             "OR (d.bankName IS NULL OR LOWER(d.bankName) LIKE  %:searchText%)")
     Page<PendingDepositResponse> searchPendingDeposits(String searchText, Pageable pageable);
+
+    List<Deposit> findByUserId(String userId);
 }
