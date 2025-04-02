@@ -36,7 +36,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
                     configuration.setAllowedOrigins(List.of("http://localhost:8083", "http://localhost:4200",
-                            "https://vinclub68.com", "http://vinclub68.com"));
+                            "https://vinclubsavings.site", "http://vinclubsavings.site"));
                     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS"));
                     configuration.setAllowedHeaders(List.of("authorization", "content-type", "x-auth-token"));
                     return configuration;
